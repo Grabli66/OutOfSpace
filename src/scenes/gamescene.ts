@@ -6,8 +6,12 @@ import {
     SceneLoader,
     Scene,
     FreeCamera,
-    HemisphericLight,
-    Vector3
+    TransformNode,
+    SpotLight,
+    Vector3,
+    Axis,
+    Space,
+    Angle
 } from "@babylonjs/core"
 
 // Основная игровая сцена
@@ -21,16 +25,26 @@ export class GameScene extends Scene {
     }
 
     async enter(): Promise<void> {
-        new HemisphericLight("hemi", new Vector3(0, 1, 0), this);
+        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), 60, 1000, this)
+        light.intensity = 1
 
-        const { meshes } = await SceneLoader.ImportMeshAsync(
+        let result = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/",
+            "flashlight.glb",
+            this
+        )
+
+        let lightMesh = result.meshes[0]
+
+        result = await SceneLoader.ImportMeshAsync(
             "",
             "./models/",
             "Prototype_Level.glb",
             this
         );
 
-        meshes.map((mesh) => {
+        result.meshes.map((mesh) => {
             mesh.checkCollisions = true;
         });
 
@@ -45,10 +59,10 @@ export class GameScene extends Scene {
         camera.applyGravity = true;
         camera.checkCollisions = true;
 
-        camera.ellipsoid = new Vector3(1, 1, 1);
+        camera.ellipsoid = new Vector3(2, 1, 2);
 
         camera.minZ = 0.45;
-        camera.speed = 0.25;
+        camera.speed = 0.15;
         camera.angularSensibility = 8000;
 
         this.onPointerDown = (evt) => {
@@ -60,5 +74,17 @@ export class GameScene extends Scene {
         camera.keysLeft.push(65);
         camera.keysDown.push(83);
         camera.keysRight.push(68);
+
+        lightMesh.rotate(Axis.Y, Angle.FromDegrees(-95).radians(), Space.LOCAL)
+        let transformNode = new TransformNode("transformNode")
+        transformNode.parent = camera;
+        transformNode.scaling = new Vector3(0.15, 0.15, 0.15);
+        transformNode.position = new Vector3(0.4, -0.45, 1.35);
+        lightMesh.parent = transformNode
+
+        this.onBeforeRenderObservable.add(() => {            
+            light.position = camera.position
+            light.setDirectionToTarget(camera.getFrontPosition(1))
+        })
     }
 }
