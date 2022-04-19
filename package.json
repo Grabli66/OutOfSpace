@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babylonjs/inspector": "^5.1.0",
+    "babylonjs-charactercontroller": "^0.4.4-alpha.1",
     "copy-webpack-plugin": "^10.2.4",
     "handlebars-loader": "^1.7.1",
     "html-webpack-plugin": "^5.5.0",
