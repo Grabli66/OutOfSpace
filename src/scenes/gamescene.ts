@@ -9,6 +9,9 @@ import {
     TransformNode,
     SpotLight,
     Vector3,
+    Color3,
+    Color4,
+    DynamicTexture,
     Axis,
     Space,
     Angle
@@ -25,8 +28,11 @@ export class GameScene extends Scene {
     }
 
     async enter(): Promise<void> {
-        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), 60, 1000, this)
-        light.intensity = 1
+        this.ambientColor = Color3.Black()
+        this.clearColor = new Color4(0, 0, 0)
+
+        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 70, this)
+        light.intensity = 20        
 
         let result = await SceneLoader.ImportMeshAsync(
             "",
