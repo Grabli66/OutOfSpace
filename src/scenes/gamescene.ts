@@ -29,74 +29,7 @@ export class GameScene extends Scene {
         super(engine)
 
         this._view = view
-    }
-
-    // async enter(): Promise<void> {
-    //     this.ambientColor = Color3.Black()
-    //     this.clearColor = new Color4(0, 0, 0)
-
-    //     let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 70, this)
-    //     light.intensity = 20        
-
-    //     let result = await SceneLoader.ImportMeshAsync(
-    //         "",
-    //         "./models/",
-    //         "flashlight.glb",
-    //         this
-    //     )
-
-    //     let lightMesh = result.meshes[0]
-
-    //     result = await SceneLoader.ImportMeshAsync(
-    //         "",
-    //         "./models/",
-    //         "Prototype_Level.glb",
-    //         this
-    //     );
-
-    //     result.meshes.map((mesh) => {
-    //         mesh.checkCollisions = true;
-    //     });
-
-    //     const framesPerSecond = 60;
-    //     const gravity = -9.81;
-    //     this.gravity = new Vector3(0, gravity / framesPerSecond, 0);
-    //     this.collisionsEnabled = true;
-
-    //     const camera = new FreeCamera("camera", new Vector3(0, 10, 0), this);
-    //     camera.attachControl();
-
-    //     camera.applyGravity = true;
-    //     camera.checkCollisions = true;
-
-    //     camera.ellipsoid = new Vector3(2, 1, 2);
-
-    //     camera.minZ = 0.45;
-    //     camera.speed = 0.15;
-    //     camera.angularSensibility = 8000;
-
-    //     this.onPointerDown = (evt) => {
-    //         if (evt.button === 0) this.getEngine().enterPointerlock();
-    //         if (evt.button === 1) this.getEngine().exitPointerlock();
-    //     };
-
-    //     camera.keysUp.push(87);
-    //     camera.keysLeft.push(65);
-    //     camera.keysDown.push(83);
-    //     camera.keysRight.push(68);
-
-    //     lightMesh.rotate(Axis.Y, Angle.FromDegrees(-95).radians(), Space.LOCAL)
-    //     let transformNode = new TransformNode("transformNode")
-    //     transformNode.parent = camera;
-    //     transformNode.scaling = new Vector3(0.15, 0.15, 0.15);
-    //     transformNode.position = new Vector3(0.4, -0.45, 1.35);
-    //     lightMesh.parent = transformNode
-
-    //     this.onBeforeRenderObservable.add(() => {            
-    //         light.position = camera.position
-    //         light.setDirectionToTarget(camera.getFrontPosition(1))
-    //     })
-    // }
+    }  
 
     async enter(): Promise<void> {
         this.onPointerDown = (evt) => {
@@ -104,10 +37,22 @@ export class GameScene extends Scene {
             if (evt.button === 1) this.getEngine().exitPointerlock();
         };
 
-        var light = new HemisphericLight("light1", new Vector3(0, 1, 0), this);
-        light.intensity = 1;
+        this.ambientColor = Color3.Black()
+        this.clearColor = new Color4(0, 0, 0)
+
+        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(60).radians(), 90, this)
+        light.intensity = 40
 
         let result = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/",
+            "flashlight.glb",
+            this
+        )
+
+        let lightMesh = result.meshes[0]
+
+        result = await SceneLoader.ImportMeshAsync(
             "",
             "./models/",
             "Prototype_Level.glb",
@@ -119,17 +64,21 @@ export class GameScene extends Scene {
         });
 
         let player = MeshBuilder.CreateCapsule("capsule", {
-            height: 3, radius:1
+            height: 3, radius: 1
         }, this)
+
         player.position.x = 8
         player.position.y = 4
 
-        player.ellipsoid = new Vector3(1.3, 1, 1.3);
+        player.ellipsoid = new Vector3(1.3, 1, 1.5);
 
         var alpha = (3 * Math.PI) / 2 - player.rotation.y;
         var beta = Math.PI / 2.5;
         var target = new Vector3(player.position.x, player.position.y + 1.5, player.position.z);
         var camera = new ArcRotateCamera("ArcRotateCamera", alpha, beta, 1, target, this);
+        camera.angularSensibilityX = 4000
+        camera.angularSensibilityY = 4000
+        camera.minZ = 0.6
 
         camera.keysLeft = [];
         camera.keysRight = [];
@@ -141,6 +90,14 @@ export class GameScene extends Scene {
         camera.lowerRadiusLimit = 2;
         camera.upperRadiusLimit = 20;
         camera.attachControl(this._view, false);
+
+        lightMesh.scaling.set(0.6, 0.6, 0.6)
+        lightMesh.rotate(Axis.Y, Angle.FromDegrees(-95).radians(), Space.LOCAL)
+        let transformNode = new TransformNode("transformNode")
+        transformNode.parent = camera;
+        transformNode.scaling = new Vector3(0.15, 0.15, 0.15);
+        transformNode.position = new Vector3(0.4, -0.45, 1.25);
+        lightMesh.parent = transformNode
 
         let cc = new CharacterController(player, camera, this, null, true);
 
@@ -160,6 +117,8 @@ export class GameScene extends Scene {
         cc.start();
 
         this.onBeforeRenderObservable.add(() => {
+            light.position = camera.position
+            light.setDirectionToTarget(camera.getFrontPosition(1))
         })
     }
 }
