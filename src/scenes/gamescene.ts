@@ -5,10 +5,10 @@ import "@babylonjs/loaders";
 import {
     SceneLoader,
     Scene,
-    FreeCamera,
+    Sound,
+    KeyboardEventTypes,
     TransformNode,
     MeshBuilder,
-    HemisphericLight,
     ArcRotateCamera,
     SpotLight,
     Vector3,
@@ -29,7 +29,7 @@ export class GameScene extends Scene {
         super(engine)
 
         this._view = view
-    }  
+    }
 
     async enter(): Promise<void> {
         this.onPointerDown = (evt) => {
@@ -37,11 +37,19 @@ export class GameScene extends Scene {
             if (evt.button === 1) this.getEngine().exitPointerlock();
         };
 
+        // var music = new Sound("Music", "./music/track1.mp3", this, null, {
+        //     loop: true,
+        //     autoplay: true
+        // });
+
+        var clickSound = new Sound("ClickSound", "./sound/click.wav", this, null, {});
+
+
         this.ambientColor = Color3.Black()
         this.clearColor = new Color4(0, 0, 0)
 
-        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(60).radians(), 90, this)
-        light.intensity = 40
+        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 60, this)
+        light.intensity = 500
 
         let result = await SceneLoader.ImportMeshAsync(
             "",
@@ -70,7 +78,7 @@ export class GameScene extends Scene {
         player.position.x = 8
         player.position.y = 4
 
-        player.ellipsoid = new Vector3(1.3, 1, 1.5);
+        player.ellipsoid = new Vector3(1.5, 1, 1.5);
 
         var alpha = (3 * Math.PI) / 2 - player.rotation.y;
         var beta = Math.PI / 2.5;
@@ -120,5 +128,15 @@ export class GameScene extends Scene {
             light.position = camera.position
             light.setDirectionToTarget(camera.getFrontPosition(1))
         })
+
+        this.onKeyboardObservable.add((ed) => {
+            if (ed.event.code == "KeyF") {
+                switch (ed.type) {
+                    case KeyboardEventTypes.KEYDOWN:
+                        clickSound.play()
+                        light.setEnabled(!light.isEnabled())
+                }
+            }
+        });
     }
 }
