@@ -49,6 +49,8 @@ export class GameScene extends Scene {
         this.clearColor = new Color4(0, 0, 0)
 
         let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 60, this)
+        light.diffuse = new Color3(1,1,1)
+        light.specular = new Color3(1,1,1)
         light.intensity = 500
 
         let result = await SceneLoader.ImportMeshAsync(
@@ -63,7 +65,8 @@ export class GameScene extends Scene {
         result = await SceneLoader.ImportMeshAsync(
             "",
             "./models/",
-            "Prototype_Level.glb",
+            //"Prototype_Level.glb",
+            "level1.glb",
             this
         );
 
@@ -75,10 +78,10 @@ export class GameScene extends Scene {
             height: 3, radius: 1
         }, this)
 
-        player.position.x = 8
-        player.position.y = 4
+        player.position.x = 0
+        player.position.y = 2
 
-        player.ellipsoid = new Vector3(1.5, 1, 1.5);
+        player.ellipsoid = new Vector3(1.1, 2, 1.1);        
 
         var alpha = (3 * Math.PI) / 2 - player.rotation.y;
         var beta = Math.PI / 2.5;
@@ -86,7 +89,7 @@ export class GameScene extends Scene {
         var camera = new ArcRotateCamera("ArcRotateCamera", alpha, beta, 1, target, this);
         camera.angularSensibilityX = 4000
         camera.angularSensibilityY = 4000
-        camera.minZ = 0.6
+        camera.minZ = 1
 
         camera.keysLeft = [];
         camera.keysRight = [];
