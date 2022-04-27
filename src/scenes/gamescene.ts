@@ -48,7 +48,7 @@ export class GameScene extends Scene {
         this.ambientColor = Color3.Black()
         this.clearColor = new Color4(0, 0, 0)
 
-        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 60, this)
+        let light = new SpotLight("spot", new Vector3(0, 1, 0), new Vector3(1, 0, 0), Angle.FromDegrees(45).radians(), 90, this)
         light.diffuse = new Color3(1,1,1)
         light.specular = new Color3(1,1,1)
         light.intensity = 500
